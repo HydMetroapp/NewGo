@@ -1,0 +1,261 @@
+
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+    output = "/home/ubuntu/HyderabadMetroApp_Production/app/node_modules/.prisma/client"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  phone         String?   @unique
+  profileImage  String?
+  isVerified    Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Metro Card
+  metroCards    MetroCard[]
+  
+  // Journeys
+  journeys      Journey[]
+  
+  // Transactions
+  transactions  Transaction[]
+  
+  // Notifications
+  notifications Notification[]
+  
+  // FCM Token for push notifications
+  fcmToken      String?
+  
+  @@map("users")
+}
+
+model MetroCard {
+  id          String   @id @default(cuid())
+  cardNumber  String   @unique
+  balance     Float    @default(0)
+  isActive    Boolean  @default(true)
+  cardType    CardType @default(REGULAR)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Journeys using this card
+  journeys    Journey[]
+  
+  @@map("metro_cards")
+}
+
+model Station {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  code        String   @unique
+  line        MetroLine
+  latitude    Float
+  longitude   Float
+  address     String
+  facilities  String[] // JSON array of facilities
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Journeys starting from this station
+  journeysFrom Journey[] @relation("FromStation")
+  
+  // Journeys ending at this station
+  journeysTo   Journey[] @relation("ToStation")
+  
+  @@map("stations")
+}
+
+model Journey {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  metroCardId     String
+  metroCard       MetroCard     @relation(fields: [metroCardId], references: [id])
+  
+  fromStationId   String
+  fromStation     Station       @relation("FromStation", fields: [fromStationId], references: [id])
+  toStationId     String?
+  toStation       Station?      @relation("ToStation", fields: [toStationId], references: [id])
+  
+  entryTime       DateTime
+  exitTime        DateTime?
+  fare            Float?
+  distance        Float?
+  duration        Int?          // in minutes
+  status          JourneyStatus @default(IN_PROGRESS)
+  
+  // Entry/Exit methods
+  entryMethod     EntryMethod   @default(QR_SCAN)
+  exitMethod      EntryMethod?
+  
+  // Geofencing data
+  entryLatitude   Float?
+  entryLongitude  Float?
+  exitLatitude    Float?
+  exitLongitude   Float?
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  @@map("journeys")
+}
+
+model Transaction {
+  id            String          @id @default(cuid())
+  userId        String
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  type          TransactionType
+  amount        Float
+  status        PaymentStatus   @default(PENDING)
+  
+  // Payment gateway details
+  razorpayOrderId    String?
+  razorpayPaymentId  String?
+  razorpaySignature  String?
+  
+  // Metro card recharge
+  metroCardId   String?
+  
+  description   String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  
+  @@map("transactions")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title     String
+  message   String
+  type      NotificationType @default(INFO)
+  isRead    Boolean          @default(false)
+  
+  // Additional data (JSON)
+  data      Json?
+  
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  
+  @@map("notifications")
+}
+
+model FareRule {
+  id          String   @id @default(cuid())
+  fromLine    MetroLine
+  toLine      MetroLine
+  minFare     Float
+  maxFare     Float
+  perKmRate   Float
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([fromLine, toLine])
+  @@map("fare_rules")
+}
+
+model QrLog {
+  id          String   @id @default(cuid())
+  userId      String
+  stationId   String
+  type        String   // 'entry' or 'exit'
+  journeyId   String?
+  generatedAt DateTime @default(now())
+  expiresAt   DateTime
+  
+  @@map("qr_logs")
+}
+
+model ScanLog {
+  id          String   @id @default(cuid())
+  scannerId   String
+  userId      String?
+  stationId   String?
+  journeyId   String?
+  qrCode      String?  // Partial QR code for debugging
+  qrType      String?  // 'entry' or 'exit'
+  success     Boolean
+  error       String?
+  scannedAt   DateTime @default(now())
+  
+  @@map("scan_logs")
+}
+
+model Scanner {
+  id        String   @id @default(cuid())
+  stationId String
+  type      String   // 'entry' or 'exit'
+  location  String?  // Description of scanner location
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("scanners")
+}
+
+// Enums
+enum CardType {
+  REGULAR
+  STUDENT
+  SENIOR_CITIZEN
+  DISABLED
+}
+
+enum MetroLine {
+  RED_LINE
+  GREEN_LINE
+  BLUE_LINE
+}
+
+enum JourneyStatus {
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum EntryMethod {
+  QR_SCAN
+  GEOFENCING
+  MANUAL
+}
+
+enum TransactionType {
+  CARD_RECHARGE
+  JOURNEY_PAYMENT
+  REFUND
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  CANCELLED
+}
+
+enum NotificationType {
+  INFO
+  WARNING
+  SUCCESS
+  ERROR
+  JOURNEY_UPDATE
+  PAYMENT_UPDATE
+}

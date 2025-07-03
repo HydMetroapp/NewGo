@@ -1,0 +1,44 @@
+
+{
+  "version": 2,
+  "name": "hyderabad-metro-pwa",
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/sw.js",
+      "headers": {
+        "cache-control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
+      "src": "/manifest.json",
+      "headers": {
+        "content-type": "application/manifest+json"
+      }
+    }
+  ],
+  "env": {
+    "DATABASE_URL": "@database-url",
+    "NEXT_PUBLIC_FIREBASE_API_KEY": "@firebase-api-key",
+    "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN": "@firebase-auth-domain",
+    "NEXT_PUBLIC_FIREBASE_PROJECT_ID": "@firebase-project-id",
+    "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET": "@firebase-storage-bucket",
+    "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "@firebase-messaging-sender-id",
+    "NEXT_PUBLIC_FIREBASE_APP_ID": "@firebase-app-id",
+    "NEXT_PUBLIC_RAZORPAY_KEY_ID": "@razorpay-key-id",
+    "RAZORPAY_KEY_SECRET": "@razorpay-key-secret",
+    "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY": "@google-maps-api-key",
+    "NEXTAUTH_SECRET": "@nextauth-secret",
+    "NEXTAUTH_URL": "@nextauth-url"
+  },
+  "functions": {
+    "app/api/**/*.js": {
+      "maxDuration": 30
+    }
+  }
+}
