@@ -1,59 +1,55 @@
+'use client'
 
-'use client';
-
-import React, { useState } from 'react';
-import { RoutePlannerMap } from '@/components/maps/route-planner-map';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Route, Clock, CreditCard, MapPin, ArrowRight, Train } from 'lucide-react';
-import { useMapsIntegration } from '@/hooks/use-maps-integration';
+import React, { useState } from 'react'
+import { RoutePlannerMap } from '@/components/maps/route-planner-map'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Route, Clock, CreditCard, MapPin, ArrowRight, Train } from 'lucide-react'
+import { useMapsIntegration } from '@/hooks/use-maps-integration'
 
 export default function JourneyPage() {
-  const [fromStationId, setFromStationId] = useState('');
-  const [toStationId, setToStationId] = useState('');
-  const [activeTab, setActiveTab] = useState('plan');
-  
-  const {
-    routeInfo,
-    isPlanning,
-    userLocation,
-    nearestStations,
-  } = useMapsIntegration();
+  const [fromStationId, setFromStationId] = useState('')
+  const [toStationId, setToStationId] = useState('')
+  const [activeTab, setActiveTab] = useState('plan')
+
+  const { routeInfo, isPlanning, userLocation, nearestStations } = useMapsIntegration()
 
   const handleRouteChange = (from: string, to: string) => {
-    setFromStationId(from);
-    setToStationId(to);
-  };
+    setFromStationId(from)
+    setToStationId(to)
+  }
 
   const calculateFare = (distance: number): number => {
     // Basic fare calculation - ₹10 base + ₹2 per km
-    const baseFare = 10;
-    const perKmRate = 2;
-    const distanceInKm = distance / 1000;
-    return Math.min(Math.max(baseFare + Math.round(distanceInKm * perKmRate), baseFare), 60);
-  };
+    const baseFare = 10
+    const perKmRate = 2
+    const distanceInKm = distance / 1000
+    return Math.min(Math.max(baseFare + Math.round(distanceInKm * perKmRate), baseFare), 60)
+  }
 
   const formatDistance = (distance: number): string => {
     if (distance < 1000) {
-      return `${Math.round(distance)}m`;
+      return `${Math.round(distance)}m`
     }
-    return `${(distance / 1000).toFixed(1)}km`;
-  };
+    return `${(distance / 1000).toFixed(1)}km`
+  }
 
   const estimateJourneyTime = (distance: number): string => {
-    const avgSpeed = 30; // km/h
-    const timeInHours = (distance / 1000) / avgSpeed;
-    const timeInMinutes = Math.round(timeInHours * 60);
-    return `${Math.max(timeInMinutes, 5)} min`;
-  };
+    const avgSpeed = 30 // km/h
+    const timeInHours = distance / 1000 / avgSpeed
+    const timeInMinutes = Math.round(timeInHours * 60)
+    return `${Math.max(timeInMinutes, 5)} min`
+  }
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-6xl">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Journey Planner</h1>
-        <p className="text-gray-600">Plan your metro journey with real-time directions and fare information</p>
+        <p className="text-gray-600">
+          Plan your metro journey with real-time directions and fare information
+        </p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -101,15 +97,19 @@ export default function JourneyPage() {
                           ₹{calculateFare(routeInfo.totalDistance)}
                         </div>
                         <p className="text-sm text-gray-600 mb-4">Total Fare</p>
-                        
+
                         <div className="grid grid-cols-2 gap-4 text-sm">
                           <div className="text-center">
                             <p className="text-gray-600">Distance</p>
-                            <p className="font-semibold">{formatDistance(routeInfo.totalDistance)}</p>
+                            <p className="font-semibold">
+                              {formatDistance(routeInfo.totalDistance)}
+                            </p>
                           </div>
                           <div className="text-center">
                             <p className="text-gray-600">Duration</p>
-                            <p className="font-semibold">{estimateJourneyTime(routeInfo.totalDistance)}</p>
+                            <p className="font-semibold">
+                              {estimateJourneyTime(routeInfo.totalDistance)}
+                            </p>
                           </div>
                         </div>
 
@@ -134,7 +134,7 @@ export default function JourneyPage() {
                         <span className="text-sm text-gray-600">Stations</span>
                         <span className="font-medium">{routeInfo.stations.length}</span>
                       </div>
-                      
+
                       {routeInfo.interchanges.length > 0 && (
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-gray-600">Interchanges</span>
@@ -152,7 +152,9 @@ export default function JourneyPage() {
                         </div>
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-gray-600">To</span>
-                          <span className="font-medium">{routeInfo.stations[routeInfo.stations.length - 1]?.name}</span>
+                          <span className="font-medium">
+                            {routeInfo.stations[routeInfo.stations.length - 1]?.name}
+                          </span>
                         </div>
                       </div>
                     </CardContent>
@@ -164,7 +166,8 @@ export default function JourneyPage() {
                     <Route className="h-12 w-12 text-gray-400 mx-auto mb-3" />
                     <h3 className="font-medium text-gray-900 mb-2">Plan Your Journey</h3>
                     <p className="text-sm text-gray-600">
-                      Select departure and destination stations to see route details and fare information.
+                      Select departure and destination stations to see route details and fare
+                      information.
                     </p>
                   </CardContent>
                 </Card>
@@ -246,5 +249,5 @@ export default function JourneyPage() {
         </div>
       )}
     </div>
-  );
+  )
 }

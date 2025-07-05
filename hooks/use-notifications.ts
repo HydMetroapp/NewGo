@@ -1,18 +1,17 @@
+'use client'
 
-'use client';
-
-import { useState } from 'react';
+import { useState } from 'react'
 
 interface UseNotificationsReturn {
-  notifications: any[];
-  unreadCount: number;
-  isLoading: boolean;
-  error: string | null;
-  hasPermission: boolean;
-  requestPermission: () => Promise<boolean>;
-  markAsRead: (notificationId: string) => Promise<void>;
-  markAllAsRead: () => Promise<void>;
-  refreshNotifications: () => Promise<void>;
+  notifications: any[]
+  unreadCount: number
+  isLoading: boolean
+  error: string | null
+  hasPermission: boolean
+  requestPermission: () => Promise<boolean>
+  markAsRead: (notificationId: string) => Promise<void>
+  markAllAsRead: () => Promise<void>
+  refreshNotifications: () => Promise<void>
 }
 
 export function useNotifications(): UseNotificationsReturn {
@@ -30,37 +29,33 @@ export function useNotifications(): UseNotificationsReturn {
       message: 'Your metro card balance is low',
       isRead: true,
       createdAt: new Date(),
-    }
-  ]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [hasPermission, setHasPermission] = useState(true);
+    },
+  ])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [hasPermission, setHasPermission] = useState(true)
 
   const requestPermission = async () => {
-    return true;
-  };
+    return true
+  }
 
   const markAsRead = async (notificationId: string) => {
-    setNotifications(prev =>
-      prev.map(notification =>
-        notification.id === notificationId
-          ? { ...notification, isRead: true }
-          : notification
-      )
-    );
-  };
+    setNotifications((prev) =>
+      prev.map((notification) =>
+        notification.id === notificationId ? { ...notification, isRead: true } : notification,
+      ),
+    )
+  }
 
   const markAllAsRead = async () => {
-    setNotifications(prev =>
-      prev.map(notification => ({ ...notification, isRead: true }))
-    );
-  };
+    setNotifications((prev) => prev.map((notification) => ({ ...notification, isRead: true })))
+  }
 
   const refreshNotifications = async () => {
     // Mock implementation
-  };
+  }
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const unreadCount = notifications.filter((n) => !n.isRead).length
 
   return {
     notifications,
@@ -72,5 +67,5 @@ export function useNotifications(): UseNotificationsReturn {
     markAsRead,
     markAllAsRead,
     refreshNotifications,
-  };
+  }
 }

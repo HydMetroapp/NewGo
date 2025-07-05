@@ -1,12 +1,10 @@
-
-
-import { Transaction, PaymentStatus } from '../types';
-import { PAYMENT_CONFIG } from '../constants';
-import { prisma } from '../db';
+import { Transaction, PaymentStatus } from '../types'
+import { PAYMENT_CONFIG } from '../constants'
+import { prisma } from '../db'
 
 declare global {
   interface Window {
-    Razorpay: any;
+    Razorpay: any
   }
 }
 
@@ -24,18 +22,18 @@ export class PaymentService {
           description,
           userId,
         }),
-      });
+      })
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create payment order');
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to create payment order')
       }
 
-      const data = await response.json();
-      return data.orderId;
+      const data = await response.json()
+      return data.orderId
     } catch (error: any) {
-      console.error('Create order error:', error);
-      throw new Error(error.message || 'Failed to create payment order');
+      console.error('Create order error:', error)
+      throw new Error(error.message || 'Failed to create payment order')
     }
   }
 
@@ -46,19 +44,19 @@ export class PaymentService {
     userId: string,
     userEmail: string,
     userName: string,
-    userPhone: string
+    userPhone: string,
   ): Promise<Transaction> {
     return new Promise((resolve, reject) => {
       if (!window.Razorpay) {
-        reject(new Error('Razorpay SDK not loaded'));
-        return;
+        reject(new Error('Razorpay SDK not loaded'))
+        return
       }
 
       // Validate Razorpay key
-      const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+      const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID
       if (!razorpayKey) {
-        reject(new Error('Razorpay configuration missing'));
-        return;
+        reject(new Error('Razorpay configuration missing'))
+        return
       }
 
       const options = {
@@ -84,18 +82,18 @@ export class PaymentService {
                 amount,
                 description,
               }),
-            });
+            })
 
             if (!verifyResponse.ok) {
-              const errorData = await verifyResponse.json();
-              throw new Error(errorData.error || 'Payment verification failed');
+              const errorData = await verifyResponse.json()
+              throw new Error(errorData.error || 'Payment verification failed')
             }
 
-            const result = await verifyResponse.json();
-            resolve(result.transaction);
+            const result = await verifyResponse.json()
+            resolve(result.transaction)
           } catch (error: any) {
-            console.error('Payment verification error:', error);
-            reject(new Error(error.message || 'Payment verification failed'));
+            console.error('Payment verification error:', error)
+            reject(new Error(error.message || 'Payment verification failed'))
           }
         },
         prefill: {
@@ -106,7 +104,7 @@ export class PaymentService {
         theme: PAYMENT_CONFIG.razorpay.theme,
         modal: {
           ondismiss: () => {
-            reject(new Error('Payment cancelled by user'));
+            reject(new Error('Payment cancelled by user'))
           },
         },
         retry: {
@@ -114,20 +112,20 @@ export class PaymentService {
           max_count: 3,
         },
         timeout: 300, // 5 minutes
-      };
+      }
 
       try {
-        const razorpay = new window.Razorpay(options);
+        const razorpay = new window.Razorpay(options)
         razorpay.on('payment.failed', (response: any) => {
-          console.error('Payment failed:', response.error);
-          reject(new Error(response.error.description || 'Payment failed'));
-        });
-        razorpay.open();
+          console.error('Payment failed:', response.error)
+          reject(new Error(response.error.description || 'Payment failed'))
+        })
+        razorpay.open()
       } catch (error: any) {
-        console.error('Razorpay initialization error:', error);
-        reject(new Error('Failed to initialize payment'));
+        console.error('Razorpay initialization error:', error)
+        reject(new Error('Failed to initialize payment'))
       }
-    });
+    })
   }
 
   static async rechargeMetroCard(
@@ -136,20 +134,18 @@ export class PaymentService {
     userId: string,
     userEmail: string,
     userName: string,
-    userPhone: string
+    userPhone: string,
   ): Promise<Transaction> {
     try {
       // Validate recharge amount
       if (!this.isValidRechargeAmount(amount)) {
-        throw new Error(`Recharge amount must be between ₹${PAYMENT_CONFIG.minRechargeAmount} and ₹${PAYMENT_CONFIG.maxRechargeAmount}`);
+        throw new Error(
+          `Recharge amount must be between ₹${PAYMENT_CONFIG.minRechargeAmount} and ₹${PAYMENT_CONFIG.maxRechargeAmount}`,
+        )
       }
 
       // Create order
-      const orderId = await this.createOrder(
-        amount,
-        `Metro Card Recharge - ₹${amount}`,
-        userId
-      );
+      const orderId = await this.createOrder(amount, `Metro Card Recharge - ₹${amount}`, userId)
 
       // Process payment
       const transaction = await this.processPayment(
@@ -159,13 +155,13 @@ export class PaymentService {
         userId,
         userEmail,
         userName,
-        userPhone
-      );
+        userPhone,
+      )
 
-      return transaction;
+      return transaction
     } catch (error: any) {
-      console.error('Recharge error:', error);
-      throw new Error(error.message || 'Failed to recharge metro card');
+      console.error('Recharge error:', error)
+      throw new Error(error.message || 'Failed to recharge metro card')
     }
   }
 
@@ -175,34 +171,34 @@ export class PaymentService {
         where: { userId },
         orderBy: { createdAt: 'desc' },
         take: limit,
-      });
+      })
 
-      return transactions as any;
+      return transactions as any
     } catch (error: any) {
-      console.error('Get transaction history error:', error);
-      throw new Error('Failed to get transaction history');
+      console.error('Get transaction history error:', error)
+      throw new Error('Failed to get transaction history')
     }
   }
 
   static loadRazorpayScript(): Promise<boolean> {
     return new Promise((resolve) => {
       if (window.Razorpay) {
-        resolve(true);
-        return;
+        resolve(true)
+        return
       }
 
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      const script = document.createElement('script')
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js'
       script.onload = () => {
-        console.log('Razorpay script loaded successfully');
-        resolve(true);
-      };
+        console.log('Razorpay script loaded successfully')
+        resolve(true)
+      }
       script.onerror = (error) => {
-        console.error('Failed to load Razorpay script:', error);
-        resolve(false);
-      };
-      document.body.appendChild(script);
-    });
+        console.error('Failed to load Razorpay script:', error)
+        resolve(false)
+      }
+      document.body.appendChild(script)
+    })
   }
 
   static isValidRechargeAmount(amount: number): boolean {
@@ -211,7 +207,7 @@ export class PaymentService {
       amount <= PAYMENT_CONFIG.maxRechargeAmount &&
       amount > 0 &&
       Number.isInteger(amount)
-    );
+    )
   }
 
   static validatePaymentData(data: any): boolean {
@@ -223,7 +219,7 @@ export class PaymentService {
       typeof data.razorpay_order_id === 'string' &&
       typeof data.razorpay_payment_id === 'string' &&
       typeof data.razorpay_signature === 'string'
-    );
+    )
   }
 
   static async refundPayment(paymentId: string, amount: number, reason: string): Promise<any> {
@@ -238,18 +234,17 @@ export class PaymentService {
           amount: amount * 100, // Convert to paise
           reason,
         }),
-      });
+      })
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Refund failed');
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Refund failed')
       }
 
-      return await response.json();
+      return await response.json()
     } catch (error: any) {
-      console.error('Refund error:', error);
-      throw new Error(error.message || 'Failed to process refund');
+      console.error('Refund error:', error)
+      throw new Error(error.message || 'Failed to process refund')
     }
   }
 }
-

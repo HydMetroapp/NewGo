@@ -1,88 +1,80 @@
+'use client'
 
-'use client';
-
-import { useState } from 'react';
-import { QrCode, MapPin, Clock, CreditCard } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { MainLayout } from '@/components/layout/main-layout';
-import { QRScanner } from '@/components/metro/qr-scanner';
-import { useAuth } from '@/hooks/use-auth';
-import { useJourney } from '@/hooks/use-journey';
-import { useMetroCard } from '@/hooks/use-metro-card';
-import { useToast } from '@/hooks/use-toast';
-import { QRCodeData, EntryMethod } from '@/lib/types';
+import { useState } from 'react'
+import { QrCode, MapPin, Clock, CreditCard } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { MainLayout } from '@/components/layout/main-layout'
+import { QRScanner } from '@/components/metro/qr-scanner'
+import { useAuth } from '@/hooks/use-auth'
+import { useJourney } from '@/hooks/use-journey'
+import { useMetroCard } from '@/hooks/use-metro-card'
+import { useToast } from '@/hooks/use-toast'
+import { QRCodeData, EntryMethod } from '@/lib/types'
 
 export default function ScannerPage() {
-  const [isScanning, setIsScanning] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  
-  const { user } = useAuth();
-  const { activeJourney, startJourney, endJourney } = useJourney();
-  const { metroCards } = useMetroCard();
-  const { toast } = useToast();
+  const [isScanning, setIsScanning] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
 
-  const primaryCard = metroCards.find(card => card.isActive) || metroCards[0];
+  const { user } = useAuth()
+  const { activeJourney, startJourney, endJourney } = useJourney()
+  const { metroCards } = useMetroCard()
+  const { toast } = useToast()
+
+  const primaryCard = metroCards.find((card) => card.isActive) || metroCards[0]
 
   const handleScanSuccess = async (qrData: QRCodeData) => {
-    setIsScanning(false);
-    setIsProcessing(true);
+    setIsScanning(false)
+    setIsProcessing(true)
 
     try {
       if (!primaryCard) {
-        throw new Error('No active metro card found. Please add a metro card first.');
+        throw new Error('No active metro card found. Please add a metro card first.')
       }
 
       if (qrData.type === 'entry') {
         if (activeJourney) {
-          throw new Error('You already have an active journey. Please complete it first.');
+          throw new Error('You already have an active journey. Please complete it first.')
         }
 
-        await startJourney(
-          primaryCard.id,
-          qrData.stationId,
-          EntryMethod.QR_SCAN
-        );
+        await startJourney(primaryCard.id, qrData.stationId, EntryMethod.QR_SCAN)
 
         toast({
           title: 'Journey Started',
           description: 'Your metro journey has begun successfully.',
-        });
+        })
       } else if (qrData.type === 'exit') {
         if (!activeJourney) {
-          throw new Error('No active journey found. Please start a journey first.');
+          throw new Error('No active journey found. Please start a journey first.')
         }
 
-        await endJourney(
-          qrData.stationId,
-          EntryMethod.QR_SCAN
-        );
+        await endJourney(qrData.stationId, EntryMethod.QR_SCAN)
 
         toast({
           title: 'Journey Completed',
           description: 'Your metro journey has been completed successfully.',
-        });
+        })
       }
     } catch (error: any) {
       toast({
         title: 'Error',
         description: error.message || 'Failed to process QR code',
         variant: 'destructive',
-      });
+      })
     } finally {
-      setIsProcessing(false);
+      setIsProcessing(false)
     }
-  };
+  }
 
   const handleScanError = (error: string) => {
-    setIsScanning(false);
+    setIsScanning(false)
     toast({
       title: 'Scan Failed',
       description: error,
       variant: 'destructive',
-    });
-  };
+    })
+  }
 
   return (
     <MainLayout>
@@ -135,9 +127,7 @@ export default function ScannerPage() {
                 </div>
                 {primaryCard.balance < 50 && (
                   <Alert className="w-auto">
-                    <AlertDescription className="text-xs">
-                      Low balance
-                    </AlertDescription>
+                    <AlertDescription className="text-xs">Low balance</AlertDescription>
                   </Alert>
                 )}
               </div>
@@ -224,5 +214,5 @@ export default function ScannerPage() {
         onClose={() => setIsScanning(false)}
       />
     </MainLayout>
-  );
+  )
 }

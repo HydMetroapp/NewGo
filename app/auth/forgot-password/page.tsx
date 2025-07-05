@@ -1,38 +1,37 @@
+'use client'
 
-'use client';
-
-import { useState } from 'react';
-import { Mail, ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAuth } from '@/hooks/use-auth';
-import Link from 'next/link';
+import { useState } from 'react'
+import { Mail, ArrowLeft } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { useAuth } from '@/hooks/use-auth'
+import Link from 'next/link'
 
 export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [error, setError] = useState('')
 
-  const { resetPassword } = useAuth();
+  const { resetPassword } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true);
+    e.preventDefault()
+    setError('')
+    setIsLoading(true)
 
     try {
-      await resetPassword(email);
-      setSuccess(true);
+      await resetPassword(email)
+      setSuccess(true)
     } catch (error: any) {
-      setError(error.message || 'Failed to send reset email');
+      setError(error.message || 'Failed to send reset email')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   if (success) {
     return (
@@ -43,14 +42,13 @@ export default function ForgotPasswordPage() {
               <Mail className="h-6 w-6 text-white" />
             </div>
             <CardTitle className="text-2xl">Check Your Email</CardTitle>
-            <CardDescription>
-              We've sent a password reset link to {email}
-            </CardDescription>
+            <CardDescription>We've sent a password reset link to {email}</CardDescription>
           </CardHeader>
 
           <CardContent className="text-center space-y-4">
             <p className="text-sm text-muted-foreground">
-              Click the link in the email to reset your password. If you don't see the email, check your spam folder.
+              Click the link in the email to reset your password. If you don't see the email, check
+              your spam folder.
             </p>
 
             <div className="space-y-2">
@@ -60,12 +58,12 @@ export default function ForgotPasswordPage() {
                   Back to Sign In
                 </Button>
               </Link>
-              
+
               <Button
                 variant="outline"
                 onClick={() => {
-                  setSuccess(false);
-                  setEmail('');
+                  setSuccess(false)
+                  setEmail('')
                 }}
                 className="w-full"
               >
@@ -75,7 +73,7 @@ export default function ForgotPasswordPage() {
           </CardContent>
         </Card>
       </div>
-    );
+    )
   }
 
   return (
@@ -115,11 +113,7 @@ export default function ForgotPasswordPage() {
               </div>
             </div>
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? 'Sending...' : 'Send Reset Link'}
             </Button>
           </form>
@@ -136,5 +130,5 @@ export default function ForgotPasswordPage() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

@@ -1,62 +1,61 @@
+'use client'
 
-'use client';
-
-import { useEffect, useState } from 'react';
-import { Play, MapPin, CreditCard, Clock, QrCode, Navigation } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { MainLayout } from '@/components/layout/main-layout';
-import { MetroCardDisplay } from '@/components/metro/metro-card-display';
-import { JourneyCard } from '@/components/metro/journey-card';
-import { useAuth } from '@/hooks/use-auth';
-import { useJourney } from '@/hooks/use-journey';
-import { useMetroCard } from '@/hooks/use-metro-card';
-import { useLocation } from '@/hooks/use-location';
-import { useGeofencing } from '@/hooks/use-geofencing';
-import { formatCurrency } from '@/lib/utils';
-import { JourneyStatus } from '@/components/metro/journey-status';
-import Link from 'next/link';
+import { useEffect, useState } from 'react'
+import { Play, MapPin, CreditCard, Clock, QrCode, Navigation } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { MainLayout } from '@/components/layout/main-layout'
+import { MetroCardDisplay } from '@/components/metro/metro-card-display'
+import { JourneyCard } from '@/components/metro/journey-card'
+import { useAuth } from '@/hooks/use-auth'
+import { useJourney } from '@/hooks/use-journey'
+import { useMetroCard } from '@/hooks/use-metro-card'
+import { useLocation } from '@/hooks/use-location'
+import { useGeofencing } from '@/hooks/use-geofencing'
+import { formatCurrency } from '@/lib/utils'
+import { JourneyStatus } from '@/components/metro/journey-status'
+import Link from 'next/link'
 
 export default function HomePage() {
-  const { user, isAuthenticated } = useAuth();
-  const { activeJourney, journeyHistory } = useJourney();
-  const { metroCards, rechargeCard } = useMetroCard();
-  const { location, nearestStation } = useLocation();
-  const { 
-    isMonitoring, 
-    currentGeofences, 
-    startMonitoring, 
+  const { user, isAuthenticated } = useAuth()
+  const { activeJourney, journeyHistory } = useJourney()
+  const { metroCards, rechargeCard } = useMetroCard()
+  const { location, nearestStation } = useLocation()
+  const {
+    isMonitoring,
+    currentGeofences,
+    startMonitoring,
     onGeofenceEvent,
-    hasLocationPermission 
-  } = useGeofencing();
-  const [stations, setStations] = useState([]);
+    hasLocationPermission,
+  } = useGeofencing()
+  const [stations, setStations] = useState([])
 
   useEffect(() => {
     // Fetch stations for location service
     fetch('/api/stations')
-      .then(res => res.json())
-      .then(data => {
-        const stationData = data.stations || [];
-        setStations(stationData);
-        
+      .then((res) => res.json())
+      .then((data) => {
+        const stationData = data.stations || []
+        setStations(stationData)
+
         // Start geofencing monitoring if user is authenticated
         if (isAuthenticated && hasLocationPermission && stationData.length > 0) {
-          startMonitoring(stationData);
+          startMonitoring(stationData)
         }
       })
-      .catch(console.error);
-  }, [isAuthenticated, hasLocationPermission]);
+      .catch(console.error)
+  }, [isAuthenticated, hasLocationPermission])
 
   useEffect(() => {
     // Set up geofence event handler
     const handleGeofenceEvent = (event) => {
-      console.log('Geofence event:', event);
+      console.log('Geofence event:', event)
       // Handle geofence entry/exit events here
-    };
+    }
 
-    onGeofenceEvent(handleGeofenceEvent);
-  }, [onGeofenceEvent]);
+    onGeofenceEvent(handleGeofenceEvent)
+  }, [onGeofenceEvent])
 
   if (!isAuthenticated) {
     return (
@@ -68,7 +67,7 @@ export default function HomePage() {
                 <span className="text-white font-bold text-lg">HM</span>
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <h1 className="text-3xl font-bold">Welcome to Hyderabad Metro</h1>
               <p className="text-muted-foreground">
@@ -110,11 +109,11 @@ export default function HomePage() {
           </div>
         </div>
       </MainLayout>
-    );
+    )
   }
 
-  const primaryCard = metroCards.find(card => card.isActive) || metroCards[0];
-  const recentJourneys = journeyHistory.slice(0, 3);
+  const primaryCard = metroCards.find((card) => card.isActive) || metroCards[0]
+  const recentJourneys = journeyHistory.slice(0, 3)
 
   return (
     <MainLayout>
@@ -123,10 +122,9 @@ export default function HomePage() {
         <div className="space-y-2">
           <h1 className="text-2xl font-bold">Welcome back, {user?.name?.split(' ')[0]}!</h1>
           <p className="text-muted-foreground">
-            {nearestStation 
+            {nearestStation
               ? `You're near ${nearestStation.name} station`
-              : 'Ready for your next journey?'
-            }
+              : 'Ready for your next journey?'}
           </p>
         </div>
 
@@ -136,11 +134,11 @@ export default function HomePage() {
             <Play className="h-5 w-5 text-blue-600" />
             Journey Status
           </h2>
-          <JourneyStatus 
+          <JourneyStatus
             stationId={currentGeofences.length > 0 ? currentGeofences[0].id : undefined}
             stationName={currentGeofences.length > 0 ? currentGeofences[0].name : undefined}
             onJourneyUpdate={(journey) => {
-              console.log('Journey updated:', journey);
+              console.log('Journey updated:', journey)
             }}
           />
         </div>
@@ -194,11 +192,11 @@ export default function HomePage() {
         {primaryCard && (
           <div className="space-y-3">
             <h2 className="text-lg font-semibold">Your Metro Card</h2>
-            <MetroCardDisplay 
-              card={primaryCard} 
+            <MetroCardDisplay
+              card={primaryCard}
               onRecharge={(cardId) => {
                 // Navigate to recharge page
-                window.location.href = `/recharge?cardId=${cardId}`;
+                window.location.href = `/recharge?cardId=${cardId}`
               }}
             />
           </div>
@@ -210,7 +208,9 @@ export default function HomePage() {
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">Recent Journeys</h2>
               <Link href="/history">
-                <Button variant="ghost" size="sm">View All</Button>
+                <Button variant="ghost" size="sm">
+                  View All
+                </Button>
               </Link>
             </div>
             <div className="space-y-3">
@@ -236,14 +236,12 @@ export default function HomePage() {
                   <p className="font-medium">{nearestStation.name}</p>
                   <p className="text-sm text-muted-foreground">{nearestStation.address}</p>
                 </div>
-                <Badge variant="outline">
-                  {nearestStation.line.replace('_', ' ')}
-                </Badge>
+                <Badge variant="outline">{nearestStation.line.replace('_', ' ')}</Badge>
               </div>
             </CardContent>
           </Card>
         )}
       </div>
     </MainLayout>
-  );
+  )
 }

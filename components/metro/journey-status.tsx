@@ -1,67 +1,66 @@
+'use client'
 
-'use client';
-
-import { useState, useEffect } from 'react';
-import { Play, Square, MapPin, Clock, CreditCard, Navigation } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { QRDisplay } from './qr-display';
-import { useJourney } from '@/hooks/use-journey';
-import { useAuth } from '@/hooks/use-auth';
-import { formatTime, formatCurrency } from '@/lib/utils';
+import { useState, useEffect } from 'react'
+import { Play, Square, MapPin, Clock, CreditCard, Navigation } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { QRDisplay } from './qr-display'
+import { useJourney } from '@/hooks/use-journey'
+import { useAuth } from '@/hooks/use-auth'
+import { formatTime, formatCurrency } from '@/lib/utils'
 
 interface JourneyStatusProps {
-  stationId?: string;
-  stationName?: string;
-  onJourneyUpdate?: (journey: any) => void;
+  stationId?: string
+  stationName?: string
+  onJourneyUpdate?: (journey: any) => void
 }
 
 export function JourneyStatus({ stationId, stationName, onJourneyUpdate }: JourneyStatusProps) {
-  const { user } = useAuth();
-  const { activeJourney, startJourney, endJourney } = useJourney();
-  const [showQR, setShowQR] = useState(false);
-  const [journeyDuration, setJourneyDuration] = useState(0);
+  const { user } = useAuth()
+  const { activeJourney, startJourney, endJourney } = useJourney()
+  const [showQR, setShowQR] = useState(false)
+  const [journeyDuration, setJourneyDuration] = useState(0)
 
   useEffect(() => {
     if (activeJourney) {
       const interval = setInterval(() => {
-        const duration = Date.now() - new Date(activeJourney.entryTime).getTime();
-        setJourneyDuration(duration);
-      }, 1000);
+        const duration = Date.now() - new Date(activeJourney.entryTime).getTime()
+        setJourneyDuration(duration)
+      }, 1000)
 
-      return () => clearInterval(interval);
+      return () => clearInterval(interval)
     }
-  }, [activeJourney]);
+  }, [activeJourney])
 
   const formatDuration = (ms: number): string => {
-    const minutes = Math.floor(ms / 60000);
-    const seconds = Math.floor((ms % 60000) / 1000);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  };
+    const minutes = Math.floor(ms / 60000)
+    const seconds = Math.floor((ms % 60000) / 1000)
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`
+  }
 
   const handleStartJourney = () => {
     if (stationId && user) {
-      setShowQR(true);
+      setShowQR(true)
     }
-  };
+  }
 
   const handleEndJourney = () => {
     if (activeJourney && stationId && user) {
-      setShowQR(true);
+      setShowQR(true)
     }
-  };
+  }
 
   const handleQRGenerated = (qrCode: string) => {
     // QR code generated successfully
-    console.log('QR code generated:', qrCode);
-  };
+    console.log('QR code generated:', qrCode)
+  }
 
   const handleQRError = (error: string) => {
-    console.error('QR generation error:', error);
-    setShowQR(false);
-  };
+    console.error('QR generation error:', error)
+    setShowQR(false)
+  }
 
   // No active journey - show start journey option
   if (!activeJourney) {
@@ -80,7 +79,7 @@ export function JourneyStatus({ stationId, stationName, onJourneyUpdate }: Journ
                 <MapPin className="h-4 w-4" />
                 Starting from {stationName}
               </div>
-              
+
               {showQR ? (
                 <QRDisplay
                   stationId={stationId}
@@ -104,7 +103,7 @@ export function JourneyStatus({ stationId, stationName, onJourneyUpdate }: Journ
           )}
         </CardContent>
       </Card>
-    );
+    )
   }
 
   // Active journey - show journey status and exit option
@@ -175,7 +174,7 @@ export function JourneyStatus({ stationId, stationName, onJourneyUpdate }: Journ
               <MapPin className="h-4 w-4" />
               Ending at {stationName}
             </div>
-            
+
             {showQR ? (
               <QRDisplay
                 stationId={stationId}
@@ -196,5 +195,5 @@ export function JourneyStatus({ stationId, stationName, onJourneyUpdate }: Journ
         </Card>
       )}
     </div>
-  );
+  )
 }

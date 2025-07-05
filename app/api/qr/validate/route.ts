@@ -1,23 +1,22 @@
-
-import { NextRequest, NextResponse } from 'next/server';
-import { EnhancedQRService } from '@/lib/services/enhanced-qr-service';
-import { JourneyService } from '@/lib/services/journey-service';
-import { prisma } from '@/lib/db';
-import { EntryMethod } from '@/lib/types';
+import { NextRequest, NextResponse } from 'next/server'
+import { EnhancedQRService } from '@/lib/services/enhanced-qr-service'
+import { JourneyService } from '@/lib/services/journey-service'
+import { prisma } from '@/lib/db'
+import { EntryMethod } from '@/lib/types'
 
 export async function POST(request: NextRequest) {
   try {
-    const { qrCode, scannerId, scannerLocation } = await request.json();
+    const { qrCode, scannerId, scannerLocation } = await request.json()
 
     if (!qrCode || !scannerId) {
       return NextResponse.json(
         { error: 'Missing required fields: qrCode, scannerId' },
-        { status: 400 }
-      );
+        { status: 400 },
+      )
     }
 
     // Validate QR code
-    const validationResult = await EnhancedQRService.validateStationQR(qrCode, scannerId);
+    const validationResult = await EnhancedQRService.validateStationQR(qrCode, scannerId)
 
     if (!validationResult.isValid) {
       // Log failed validation (optional)
@@ -29,38 +28,38 @@ export async function POST(request: NextRequest) {
             success: false,
             error: validationResult.error,
             scannedAt: new Date(),
-          }
-        });
+          },
+        })
       } catch (error) {
-        console.warn('Scan logging failed:', error);
+        console.warn('Scan logging failed:', error)
       }
 
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           error: validationResult.error,
-          action: 'deny'
+          action: 'deny',
         },
-        { status: 400 }
-      );
+        { status: 400 },
+      )
     }
 
-    const qrData = validationResult.data!;
+    const qrData = validationResult.data!
 
     try {
-      let journeyResult;
+      let journeyResult
 
       if (qrData.type === 'entry') {
         // Start new journey
         const metroCard = await prisma.metroCard.findFirst({
-          where: { 
+          where: {
             userId: qrData.userId,
-            isActive: true 
-          }
-        });
+            isActive: true,
+          },
+        })
 
         if (!metroCard) {
-          throw new Error('No active metro card found');
+          throw new Error('No active metro card found')
         }
 
         journeyResult = await JourneyService.startJourney(
@@ -69,15 +68,14 @@ export async function POST(request: NextRequest) {
           qrData.stationId,
           EntryMethod.QR_SCAN,
           scannerLocation?.latitude,
-          scannerLocation?.longitude
-        );
-
+          scannerLocation?.longitude,
+        )
       } else if (qrData.type === 'exit') {
         // End existing journey
-        const activeJourney = await JourneyService.getActiveJourney(qrData.userId);
-        
+        const activeJourney = await JourneyService.getActiveJourney(qrData.userId)
+
         if (!activeJourney) {
-          throw new Error('No active journey found');
+          throw new Error('No active journey found')
         }
 
         journeyResult = await JourneyService.endJourney(
@@ -85,8 +83,8 @@ export async function POST(request: NextRequest) {
           qrData.stationId,
           EntryMethod.QR_SCAN,
           scannerLocation?.latitude,
-          scannerLocation?.longitude
-        );
+          scannerLocation?.longitude,
+        )
       }
 
       // Log successful scan (optional)
@@ -100,10 +98,10 @@ export async function POST(request: NextRequest) {
             qrType: qrData.type,
             success: true,
             scannedAt: new Date(),
-          }
-        });
+          },
+        })
       } catch (error) {
-        console.warn('Scan logging failed:', error);
+        console.warn('Scan logging failed:', error)
       }
 
       return NextResponse.json({
@@ -112,14 +110,13 @@ export async function POST(request: NextRequest) {
         journey: journeyResult,
         station: {
           id: qrData.stationId,
-          code: qrData.stationCode
+          code: qrData.stationCode,
         },
         user: {
-          id: qrData.userId
+          id: qrData.userId,
         },
-        timestamp: Date.now()
-      });
-
+        timestamp: Date.now(),
+      })
     } catch (journeyError: any) {
       // Log journey error but still record the scan attempt (optional)
       try {
@@ -132,31 +129,30 @@ export async function POST(request: NextRequest) {
             success: false,
             error: journeyError.message,
             scannedAt: new Date(),
-          }
-        });
+          },
+        })
       } catch (error) {
-        console.warn('Scan logging failed:', error);
+        console.warn('Scan logging failed:', error)
       }
 
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           error: journeyError.message,
-          action: 'deny'
+          action: 'deny',
         },
-        { status: 400 }
-      );
+        { status: 400 },
+      )
     }
-
   } catch (error: any) {
-    console.error('QR validation error:', error);
+    console.error('QR validation error:', error)
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         error: error.message || 'QR validation failed',
-        action: 'deny'
+        action: 'deny',
       },
-      { status: 500 }
-    );
+      { status: 500 },
+    )
   }
 }

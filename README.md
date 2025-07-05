@@ -1,4 +1,3 @@
-
 # 🚇 Hyderabad Metro PWA
 
 [![License: MIT](https://i.ytimg.com/vi/xt4SuGd2pnY/hqdefault.jpg)
@@ -25,18 +24,20 @@ A modern, responsive Progressive Web Application (PWA) for the Hyderabad Metro R
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn package manager
 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/yourusername/hyderabad-metro-pwa.git
    cd hyderabad-metro-pwa
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    # or
@@ -44,12 +45,15 @@ A modern, responsive Progressive Web Application (PWA) for the Hyderabad Metro R
    ```
 
 3. **Set up environment variables**
+
    ```bash
    cp .env.example .env.local
    ```
+
    Edit `.env.local` with your configuration values.
 
 4. **Run the development server**
+
    ```bash
    npm run dev
    # or
@@ -118,6 +122,7 @@ NEXT_PUBLIC_GA_ID=your-google-analytics-id
 ### PWA Configuration
 
 The app is configured as a Progressive Web App with:
+
 - Service Worker for offline functionality
 - Web App Manifest for installation
 - Responsive design for all devices

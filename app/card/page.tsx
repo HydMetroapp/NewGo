@@ -1,61 +1,66 @@
+'use client'
 
-'use client';
-
-import { useState } from 'react';
-import { Plus, CreditCard, History, Zap } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { MainLayout } from '@/components/layout/main-layout';
-import { MetroCardDisplay } from '@/components/metro/metro-card-display';
-import { useMetroCard } from '@/hooks/use-metro-card';
-import { useToast } from '@/hooks/use-toast';
-import { PAYMENT_CONFIG } from '@/lib/constants';
-import { formatCurrency } from '@/lib/utils';
+import { useState } from 'react'
+import { Plus, CreditCard, History, Zap } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { MainLayout } from '@/components/layout/main-layout'
+import { MetroCardDisplay } from '@/components/metro/metro-card-display'
+import { useMetroCard } from '@/hooks/use-metro-card'
+import { useToast } from '@/hooks/use-toast'
+import { PAYMENT_CONFIG } from '@/lib/constants'
+import { formatCurrency } from '@/lib/utils'
 
 export default function MetroCardPage() {
-  const [rechargeAmount, setRechargeAmount] = useState('');
-  const [selectedCardId, setSelectedCardId] = useState('');
-  const [isRecharging, setIsRecharging] = useState(false);
-  const [showRechargeDialog, setShowRechargeDialog] = useState(false);
+  const [rechargeAmount, setRechargeAmount] = useState('')
+  const [selectedCardId, setSelectedCardId] = useState('')
+  const [isRecharging, setIsRecharging] = useState(false)
+  const [showRechargeDialog, setShowRechargeDialog] = useState(false)
 
-  const { metroCards, transactions, rechargeCard, isLoading } = useMetroCard();
-  const { toast } = useToast();
+  const { metroCards, transactions, rechargeCard, isLoading } = useMetroCard()
+  const { toast } = useToast()
 
   const handleRecharge = async () => {
-    if (!selectedCardId || !rechargeAmount) return;
+    if (!selectedCardId || !rechargeAmount) return
 
-    const amount = parseFloat(rechargeAmount);
+    const amount = parseFloat(rechargeAmount)
     if (isNaN(amount) || amount < PAYMENT_CONFIG.minRechargeAmount) {
       toast({
         title: 'Invalid Amount',
         description: `Minimum recharge amount is ${formatCurrency(PAYMENT_CONFIG.minRechargeAmount)}`,
         variant: 'destructive',
-      });
-      return;
+      })
+      return
     }
 
-    setIsRecharging(true);
+    setIsRecharging(true)
     try {
-      await rechargeCard(selectedCardId, amount);
-      setShowRechargeDialog(false);
-      setRechargeAmount('');
-      setSelectedCardId('');
+      await rechargeCard(selectedCardId, amount)
+      setShowRechargeDialog(false)
+      setRechargeAmount('')
+      setSelectedCardId('')
     } catch (error: any) {
       // Error is handled in the hook
     } finally {
-      setIsRecharging(false);
+      setIsRecharging(false)
     }
-  };
+  }
 
   const openRechargeDialog = (cardId: string) => {
-    setSelectedCardId(cardId);
-    setShowRechargeDialog(true);
-  };
+    setSelectedCardId(cardId)
+    setShowRechargeDialog(true)
+  }
 
-  const recentTransactions = transactions.slice(0, 5);
+  const recentTransactions = transactions.slice(0, 5)
 
   return (
     <MainLayout>
@@ -74,11 +79,7 @@ export default function MetroCardPage() {
         <div className="space-y-4">
           {metroCards.length > 0 ? (
             metroCards.map((card) => (
-              <MetroCardDisplay
-                key={card.id}
-                card={card}
-                onRecharge={openRechargeDialog}
-              />
+              <MetroCardDisplay key={card.id} card={card} onRecharge={openRechargeDialog} />
             ))
           ) : (
             <Card>
@@ -86,7 +87,8 @@ export default function MetroCardPage() {
                 <CreditCard className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-lg font-medium mb-2">No Metro Cards</h3>
                 <p className="text-muted-foreground mb-4">
-                  You don't have any metro cards yet. A default card will be created when you sign up.
+                  You don't have any metro cards yet. A default card will be created when you sign
+                  up.
                 </p>
               </CardContent>
             </Card>
@@ -109,9 +111,9 @@ export default function MetroCardPage() {
                   variant="outline"
                   onClick={() => {
                     if (metroCards.length > 0) {
-                      setSelectedCardId(metroCards[0].id);
-                      setRechargeAmount(amount.toString());
-                      setShowRechargeDialog(true);
+                      setSelectedCardId(metroCards[0].id)
+                      setRechargeAmount(amount.toString())
+                      setShowRechargeDialog(true)
                     }
                   }}
                   disabled={metroCards.length === 0}
@@ -151,10 +153,13 @@ export default function MetroCardPage() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className={`font-medium ${
-                        transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
-                      }`}>
-                        {transaction.amount > 0 ? '+' : ''}{formatCurrency(Math.abs(transaction.amount))}
+                      <p
+                        className={`font-medium ${
+                          transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
+                        }`}
+                      >
+                        {transaction.amount > 0 ? '+' : ''}
+                        {formatCurrency(Math.abs(transaction.amount))}
                       </p>
                       <p className="text-sm text-muted-foreground capitalize">
                         {transaction.status.toLowerCase()}
@@ -186,8 +191,8 @@ export default function MetroCardPage() {
                   max={PAYMENT_CONFIG.maxRechargeAmount}
                 />
                 <p className="text-sm text-muted-foreground mt-1">
-                  Minimum: {formatCurrency(PAYMENT_CONFIG.minRechargeAmount)}, 
-                  Maximum: {formatCurrency(PAYMENT_CONFIG.maxRechargeAmount)}
+                  Minimum: {formatCurrency(PAYMENT_CONFIG.minRechargeAmount)}, Maximum:{' '}
+                  {formatCurrency(PAYMENT_CONFIG.maxRechargeAmount)}
                 </p>
               </div>
 
@@ -225,5 +230,5 @@ export default function MetroCardPage() {
         </Dialog>
       </div>
     </MainLayout>
-  );
+  )
 }

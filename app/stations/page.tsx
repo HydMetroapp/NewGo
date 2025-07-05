@@ -1,38 +1,39 @@
+'use client'
 
-'use client';
-
-import React, { useState } from 'react';
-import { StationFinderMap } from '@/components/maps/station-finder-map';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { MapPin, Search, Train, Clock, Zap } from 'lucide-react';
-import { METRO_STATIONS_DATA, METRO_LINES } from '@/lib/constants';
+import React, { useState } from 'react'
+import { StationFinderMap } from '@/components/maps/station-finder-map'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Input } from '@/components/ui/input'
+import { MapPin, Search, Train, Clock, Zap } from 'lucide-react'
+import { METRO_STATIONS_DATA, METRO_LINES } from '@/lib/constants'
 
 export default function StationsPage() {
-  const [selectedStationId, setSelectedStationId] = useState<string>('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedLine, setSelectedLine] = useState<string>('all');
+  const [selectedStationId, setSelectedStationId] = useState<string>('')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedLine, setSelectedLine] = useState<string>('all')
 
-  const filteredStations = METRO_STATIONS_DATA.filter(station => {
-    const matchesSearch = station.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesLine = selectedLine === 'all' || station.line === selectedLine;
-    return matchesSearch && matchesLine;
-  });
+  const filteredStations = METRO_STATIONS_DATA.filter((station) => {
+    const matchesSearch = station.name.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesLine = selectedLine === 'all' || station.line === selectedLine
+    return matchesSearch && matchesLine
+  })
 
-  const selectedStation = METRO_STATIONS_DATA.find(s => s.id === selectedStationId);
+  const selectedStation = METRO_STATIONS_DATA.find((s) => s.id === selectedStationId)
 
   const handleStationSelect = (stationId: string) => {
-    setSelectedStationId(stationId);
-  };
+    setSelectedStationId(stationId)
+  }
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-6xl">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Metro Stations</h1>
-        <p className="text-gray-600">Find and explore Hyderabad Metro stations with interactive maps</p>
+        <p className="text-gray-600">
+          Find and explore Hyderabad Metro stations with interactive maps
+        </p>
       </div>
 
       <Tabs defaultValue="map" className="space-y-6">
@@ -73,8 +74,9 @@ export default function StationsPage() {
                       <div className="flex items-center mt-1">
                         <div
                           className="w-3 h-3 rounded-full mr-2"
-                          style={{ 
-                            backgroundColor: METRO_LINES[selectedStation.line as keyof typeof METRO_LINES]?.color 
+                          style={{
+                            backgroundColor:
+                              METRO_LINES[selectedStation.line as keyof typeof METRO_LINES]?.color,
                           }}
                         />
                         <span className="text-sm text-gray-600">
@@ -86,7 +88,8 @@ export default function StationsPage() {
                     <div>
                       <h4 className="font-medium text-gray-900 mb-2">Location</h4>
                       <p className="text-sm text-gray-600">
-                        {selectedStation.latitude.toFixed(4)}, {selectedStation.longitude.toFixed(4)}
+                        {selectedStation.latitude.toFixed(4)},{' '}
+                        {selectedStation.longitude.toFixed(4)}
                       </p>
                     </div>
 
@@ -117,7 +120,8 @@ export default function StationsPage() {
                     <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-3" />
                     <h3 className="font-medium text-gray-900 mb-2">Select a Station</h3>
                     <p className="text-sm text-gray-600">
-                      Click on a station marker on the map or select from the nearest stations list to view details.
+                      Click on a station marker on the map or select from the nearest stations list
+                      to view details.
                     </p>
                   </CardContent>
                 </Card>
@@ -197,9 +201,9 @@ export default function StationsPage() {
           {/* Stations Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredStations.map((station) => {
-              const lineInfo = METRO_LINES[station.line as keyof typeof METRO_LINES];
-              const isSelected = selectedStationId === station.id;
-              
+              const lineInfo = METRO_LINES[station.line as keyof typeof METRO_LINES]
+              const isSelected = selectedStationId === station.id
+
               return (
                 <Card
                   key={station.id}
@@ -250,7 +254,7 @@ export default function StationsPage() {
                     </div>
                   </CardContent>
                 </Card>
-              );
+              )
             })}
           </div>
 
@@ -268,5 +272,5 @@ export default function StationsPage() {
         </TabsContent>
       </Tabs>
     </div>
-  );
+  )
 }

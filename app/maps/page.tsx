@@ -1,24 +1,23 @@
+'use client'
 
-'use client';
-
-import React, { useState } from 'react';
-import { SimpleMap } from '@/components/maps/simple-map';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { MapPin, Search, Navigation, Train } from 'lucide-react';
-import { METRO_STATIONS_DATA, METRO_LINES } from '@/lib/constants';
+import React, { useState } from 'react'
+import { SimpleMap } from '@/components/maps/simple-map'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { MapPin, Search, Navigation, Train } from 'lucide-react'
+import { METRO_STATIONS_DATA, METRO_LINES } from '@/lib/constants'
 
 export default function MapsPage() {
-  const [selectedStationId, setSelectedStationId] = useState<string>('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedStationId, setSelectedStationId] = useState<string>('')
+  const [searchQuery, setSearchQuery] = useState('')
 
-  const filteredStations = METRO_STATIONS_DATA.filter(station =>
-    station.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredStations = METRO_STATIONS_DATA.filter((station) =>
+    station.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  )
 
-  const selectedStation = METRO_STATIONS_DATA.find(s => s.id === selectedStationId);
+  const selectedStation = METRO_STATIONS_DATA.find((s) => s.id === selectedStationId)
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-6xl">
@@ -36,7 +35,7 @@ export default function MapsPage() {
             selectedStationId={selectedStationId}
             onStationSelect={setSelectedStationId}
           />
-          
+
           {/* Map Legend */}
           <Card>
             <CardHeader>
@@ -78,12 +77,12 @@ export default function MapsPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                
+
                 <div className="max-h-48 overflow-y-auto space-y-1">
                   {filteredStations.slice(0, 10).map((station) => {
-                    const lineInfo = METRO_LINES[station.line as keyof typeof METRO_LINES];
-                    const isSelected = selectedStationId === station.id;
-                    
+                    const lineInfo = METRO_LINES[station.line as keyof typeof METRO_LINES]
+                    const isSelected = selectedStationId === station.id
+
                     return (
                       <div
                         key={station.id}
@@ -104,11 +103,13 @@ export default function MapsPage() {
                             </div>
                           </div>
                           {isSelected && (
-                            <Badge variant="default" className="text-xs">Selected</Badge>
+                            <Badge variant="default" className="text-xs">
+                              Selected
+                            </Badge>
                           )}
                         </div>
                       </div>
-                    );
+                    )
                   })}
                 </div>
               </div>
@@ -130,8 +131,9 @@ export default function MapsPage() {
                   <div className="flex items-center mt-1">
                     <div
                       className="w-3 h-3 rounded-full mr-2"
-                      style={{ 
-                        backgroundColor: METRO_LINES[selectedStation.line as keyof typeof METRO_LINES]?.color 
+                      style={{
+                        backgroundColor:
+                          METRO_LINES[selectedStation.line as keyof typeof METRO_LINES]?.color,
                       }}
                     />
                     <span className="text-sm text-gray-600">
@@ -205,5 +207,5 @@ export default function MapsPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

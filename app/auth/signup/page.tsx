@@ -1,17 +1,16 @@
+'use client'
 
-'use client';
-
-import { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, User, Phone } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAuth } from '@/hooks/use-auth';
-import { useToast } from '@/hooks/use-toast';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react'
+import { Eye, EyeOff, Mail, Lock, User, Phone } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { useAuth } from '@/hooks/use-auth'
+import { useToast } from '@/hooks/use-toast'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function SignUpPage() {
   const [formData, setFormData] = useState({
@@ -20,53 +19,53 @@ export default function SignUpPage() {
     phone: '',
     password: '',
     confirmPassword: '',
-  });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  })
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const { signUp } = useAuth();
-  const { toast } = useToast();
-  const router = useRouter();
+  const { signUp } = useAuth()
+  const { toast } = useToast()
+  const router = useRouter()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
-    }));
-  };
+      [e.target.name]: e.target.value,
+    }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
+    e.preventDefault()
+    setError('')
 
     // Validation
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
+      setError('Passwords do not match')
+      return
     }
 
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
-      return;
+      setError('Password must be at least 6 characters long')
+      return
     }
 
-    setIsLoading(true);
+    setIsLoading(true)
 
     try {
-      await signUp(formData.email, formData.password, formData.name, formData.phone);
+      await signUp(formData.email, formData.password, formData.name, formData.phone)
       toast({
         title: 'Account created!',
         description: 'Please check your email to verify your account.',
-      });
-      router.push('/');
+      })
+      router.push('/')
     } catch (error: any) {
-      setError(error.message || 'Failed to create account');
+      setError(error.message || 'Failed to create account')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
@@ -76,9 +75,7 @@ export default function SignUpPage() {
             <span className="text-white font-bold text-lg">HM</span>
           </div>
           <CardTitle className="text-2xl">Create Account</CardTitle>
-          <CardDescription>
-            Join Hyderabad Metro for seamless travel
-          </CardDescription>
+          <CardDescription>Join Hyderabad Metro for seamless travel</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -160,11 +157,7 @@ export default function SignUpPage() {
                   className="absolute right-0 top-0 h-full px-3"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
             </div>
@@ -199,11 +192,7 @@ export default function SignUpPage() {
               </div>
             </div>
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? 'Creating Account...' : 'Create Account'}
             </Button>
           </form>
@@ -219,5 +208,5 @@ export default function SignUpPage() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

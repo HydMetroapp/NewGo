@@ -1,43 +1,48 @@
+'use client'
 
-'use client';
-
-import { Clock, MapPin, CreditCard, Route } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Journey, JourneyStatus } from '@/lib/types';
-import { formatCurrency, formatDateTime, formatDuration, getLineColor, getLineName } from '@/lib/utils';
+import { Clock, MapPin, CreditCard, Route } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Journey, JourneyStatus } from '@/lib/types'
+import {
+  formatCurrency,
+  formatDateTime,
+  formatDuration,
+  getLineColor,
+  getLineName,
+} from '@/lib/utils'
 
 interface JourneyCardProps {
-  journey: Journey;
-  className?: string;
+  journey: Journey
+  className?: string
 }
 
 export function JourneyCard({ journey, className }: JourneyCardProps) {
   const getStatusColor = (status: JourneyStatus) => {
     switch (status) {
       case JourneyStatus.COMPLETED:
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800'
       case JourneyStatus.IN_PROGRESS:
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 text-blue-800'
       case JourneyStatus.CANCELLED:
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800'
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800'
     }
-  };
+  }
 
   const getStatusText = (status: JourneyStatus) => {
     switch (status) {
       case JourneyStatus.COMPLETED:
-        return 'Completed';
+        return 'Completed'
       case JourneyStatus.IN_PROGRESS:
-        return 'In Progress';
+        return 'In Progress'
       case JourneyStatus.CANCELLED:
-        return 'Cancelled';
+        return 'Cancelled'
       default:
-        return 'Unknown';
+        return 'Unknown'
     }
-  };
+  }
 
   return (
     <Card className={className}>
@@ -47,9 +52,7 @@ export function JourneyCard({ journey, className }: JourneyCardProps) {
             <Route className="h-4 w-4" />
             Journey Details
           </CardTitle>
-          <Badge className={getStatusColor(journey.status)}>
-            {getStatusText(journey.status)}
-          </Badge>
+          <Badge className={getStatusColor(journey.status)}>{getStatusText(journey.status)}</Badge>
         </div>
       </CardHeader>
 
@@ -58,7 +61,7 @@ export function JourneyCard({ journey, className }: JourneyCardProps) {
         <div className="space-y-3">
           {/* From Station */}
           <div className="flex items-center gap-3">
-            <div 
+            <div
               className="h-3 w-3 rounded-full"
               style={{ backgroundColor: getLineColor(journey.fromStation.line) }}
             />
@@ -71,21 +74,20 @@ export function JourneyCard({ journey, className }: JourneyCardProps) {
           </div>
 
           {/* Connection Line */}
-          {journey.toStation && (
-            <div className="ml-1.5 h-6 w-0.5 bg-gray-300" />
-          )}
+          {journey.toStation && <div className="ml-1.5 h-6 w-0.5 bg-gray-300" />}
 
           {/* To Station */}
           {journey.toStation ? (
             <div className="flex items-center gap-3">
-              <div 
+              <div
                 className="h-3 w-3 rounded-full"
                 style={{ backgroundColor: getLineColor(journey.toStation.line) }}
               />
               <div className="flex-1">
                 <p className="font-medium">{journey.toStation.name}</p>
                 <p className="text-xs text-muted-foreground">
-                  {getLineName(journey.toStation.line)} • {journey.exitTime && formatDateTime(journey.exitTime)}
+                  {getLineName(journey.toStation.line)} •{' '}
+                  {journey.exitTime && formatDateTime(journey.exitTime)}
                 </p>
               </div>
             </div>
@@ -135,5 +137,5 @@ export function JourneyCard({ journey, className }: JourneyCardProps) {
         )}
       </CardContent>
     </Card>
-  );
+  )
 }

@@ -1,72 +1,71 @@
+'use client'
 
-'use client';
-
-import React, { useState, useEffect } from 'react';
-import { SimpleMap } from './simple-map';
-import { useLocation } from '@/hooks/use-location';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { MapPin, Navigation, Clock, Zap } from 'lucide-react';
-import { METRO_LINES, METRO_STATIONS_DATA } from '@/lib/constants';
+import React, { useState, useEffect } from 'react'
+import { SimpleMap } from './simple-map'
+import { useLocation } from '@/hooks/use-location'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { MapPin, Navigation, Clock, Zap } from 'lucide-react'
+import { METRO_LINES, METRO_STATIONS_DATA } from '@/lib/constants'
 
 interface StationFinderMapProps {
-  onStationSelect?: (stationId: string) => void;
-  selectedStationId?: string;
+  onStationSelect?: (stationId: string) => void
+  selectedStationId?: string
 }
 
 export const StationFinderMap: React.FC<StationFinderMapProps> = ({
   onStationSelect,
   selectedStationId,
 }) => {
-  const { location, isLoading: locationLoading, requestLocation } = useLocation();
-  const [nearestStations, setNearestStations] = useState<any[]>([]);
-  const [showDirections, setShowDirections] = useState(false);
+  const { location, isLoading: locationLoading, requestLocation } = useLocation()
+  const [nearestStations, setNearestStations] = useState<any[]>([])
+  const [showDirections, setShowDirections] = useState(false)
 
   useEffect(() => {
     if (location) {
-      findNearestStations();
+      findNearestStations()
     }
-  }, [location]);
+  }, [location])
 
   const findNearestStations = async () => {
-    if (!location) return;
+    if (!location) return
 
     try {
       // Simple nearest stations calculation
       const stations = METRO_STATIONS_DATA.slice(0, 5).map((station, index) => ({
         ...station,
-        distance: (index + 1) * 500 // Mock distance
-      }));
-      setNearestStations(stations);
+        distance: (index + 1) * 500, // Mock distance
+      }))
+      setNearestStations(stations)
     } catch (error) {
-      console.error('Failed to find nearest stations:', error);
+      console.error('Failed to find nearest stations:', error)
     }
-  };
+  }
 
   const handleStationSelect = (stationId: string) => {
-    onStationSelect?.(stationId);
-    setShowDirections(false);
-  };
+    onStationSelect?.(stationId)
+    setShowDirections(false)
+  }
 
   const handleShowDirections = (stationId: string) => {
-    onStationSelect?.(stationId);
-    setShowDirections(true);
-  };
+    onStationSelect?.(stationId)
+    setShowDirections(true)
+  }
 
   const formatDistance = (distance: number): string => {
     if (distance < 1000) {
-      return `${Math.round(distance)}m`;
+      return `${Math.round(distance)}m`
     }
-    return `${(distance / 1000).toFixed(1)}km`;
-  };
+    return `${(distance / 1000).toFixed(1)}km`
+  }
 
   const getWalkingTime = (distance: number): string => {
-    const walkingSpeed = 5; // km/h
-    const timeInHours = (distance / 1000) / walkingSpeed;
-    const timeInMinutes = Math.round(timeInHours * 60);
-    return `${timeInMinutes} min`;
-  };
+    const walkingSpeed = 5 // km/h
+    const timeInHours = distance / 1000 / walkingSpeed
+    const timeInMinutes = Math.round(timeInHours * 60)
+    return `${timeInMinutes} min`
+  }
 
   return (
     <div className="space-y-4">
@@ -80,11 +79,7 @@ export const StationFinderMap: React.FC<StationFinderMapProps> = ({
               <p className="text-sm text-gray-600 mb-4">
                 Allow location access to find metro stations near you
               </p>
-              <Button 
-                onClick={requestLocation} 
-                disabled={locationLoading}
-                className="w-full"
-              >
+              <Button onClick={requestLocation} disabled={locationLoading} className="w-full">
                 {locationLoading ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
@@ -122,9 +117,9 @@ export const StationFinderMap: React.FC<StationFinderMapProps> = ({
           <CardContent className="p-0">
             <div className="space-y-0">
               {nearestStations.map((station, index) => {
-                const lineInfo = METRO_LINES[station.line as keyof typeof METRO_LINES];
-                const isSelected = selectedStationId === station.id;
-                
+                const lineInfo = METRO_LINES[station.line as keyof typeof METRO_LINES]
+                const isSelected = selectedStationId === station.id
+
                 return (
                   <div
                     key={station.id}
@@ -144,7 +139,7 @@ export const StationFinderMap: React.FC<StationFinderMapProps> = ({
                             #{index + 1}
                           </Badge>
                         </div>
-                        
+
                         <div className="flex items-center space-x-4 text-sm text-gray-600">
                           <span className="flex items-center">
                             <MapPin className="h-3 w-3 mr-1" />
@@ -175,7 +170,7 @@ export const StationFinderMap: React.FC<StationFinderMapProps> = ({
                       <div className="flex flex-col space-y-2 ml-4">
                         <Button
                           size="sm"
-                          variant={isSelected ? "default" : "outline"}
+                          variant={isSelected ? 'default' : 'outline'}
                           onClick={() => handleStationSelect(station.id)}
                         >
                           {isSelected ? 'Selected' : 'Select'}
@@ -192,7 +187,7 @@ export const StationFinderMap: React.FC<StationFinderMapProps> = ({
                       </div>
                     </div>
                   </div>
-                );
+                )
               })}
             </div>
           </CardContent>
@@ -205,7 +200,7 @@ export const StationFinderMap: React.FC<StationFinderMapProps> = ({
           <Button
             variant="outline"
             onClick={() => {
-              setShowDirections(false);
+              setShowDirections(false)
             }}
           >
             Clear Directions
@@ -213,5 +208,5 @@ export const StationFinderMap: React.FC<StationFinderMapProps> = ({
         </div>
       )}
     </div>
-  );
-};
+  )
+}

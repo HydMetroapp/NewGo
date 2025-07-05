@@ -41,9 +41,7 @@ export function TaskCard({
               checked={completed}
               onCheckedChange={(checked) => onComplete(id, checked as boolean)}
             />
-            <CardTitle className={`text-lg ${completed ? 'line-through' : ''}`}>
-              {title}
-            </CardTitle>
+            <CardTitle className={`text-lg ${completed ? 'line-through' : ''}`}>{title}</CardTitle>
           </div>
           <div className="flex space-x-2">
             <Button variant="ghost" size="icon" onClick={() => onEdit(id)}>

@@ -1,18 +1,17 @@
+'use client'
 
-'use client';
-
-import { useEffect, useState } from 'react';
-import { Camera, X, Flashlight, RotateCcw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useQRScanner } from '@/hooks/use-qr-scanner';
-import { QRCodeData } from '@/lib/types';
+import { useEffect, useState } from 'react'
+import { Camera, X, Flashlight, RotateCcw } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { useQRScanner } from '@/hooks/use-qr-scanner'
+import { QRCodeData } from '@/lib/types'
 
 interface QRScannerProps {
-  onScanSuccess: (data: QRCodeData) => void;
-  onClose: () => void;
-  isOpen: boolean;
+  onScanSuccess: (data: QRCodeData) => void
+  onClose: () => void
+  isOpen: boolean
 }
 
 export function QRScanner({ onScanSuccess, onClose, isOpen }: QRScannerProps) {
@@ -25,68 +24,68 @@ export function QRScanner({ onScanSuccess, onClose, isOpen }: QRScannerProps) {
     stopScanning,
     scanQRCode,
     requestPermission,
-  } = useQRScanner();
+  } = useQRScanner()
 
-  const [scanInterval, setScanInterval] = useState<NodeJS.Timeout | null>(null);
+  const [scanInterval, setScanInterval] = useState<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     if (isOpen && !isScanning) {
-      initializeScanner();
+      initializeScanner()
     }
 
     return () => {
       if (scanInterval) {
-        clearInterval(scanInterval);
+        clearInterval(scanInterval)
       }
-      stopScanning();
-    };
-  }, [isOpen]);
+      stopScanning()
+    }
+  }, [isOpen])
 
   const initializeScanner = async () => {
     try {
       if (!hasPermission) {
-        const granted = await requestPermission();
+        const granted = await requestPermission()
         if (!granted) {
-          return;
+          return
         }
       }
 
-      await startScanning();
-      startScanLoop();
+      await startScanning()
+      startScanLoop()
     } catch (error) {
-      console.error('Failed to initialize scanner:', error);
+      console.error('Failed to initialize scanner:', error)
     }
-  };
+  }
 
   const startScanLoop = () => {
     const interval = setInterval(async () => {
       try {
-        const qrData = await scanQRCode();
+        const qrData = await scanQRCode()
         if (qrData) {
-          clearInterval(interval);
-          setScanInterval(null);
-          onScanSuccess(qrData);
+          clearInterval(interval)
+          setScanInterval(null)
+          onScanSuccess(qrData)
         }
       } catch (error) {
         // Continue scanning on error
       }
-    }, 500);
+    }, 500)
 
-    setScanInterval(interval);
-  };
+    setScanInterval(interval)
+  }
 
   const handleRetry = () => {
     if (scanInterval) {
-      clearInterval(scanInterval);
-      setScanInterval(null);
+      clearInterval(scanInterval)
+      setScanInterval(null)
     }
-    stopScanning();
+    stopScanning()
     setTimeout(() => {
-      initializeScanner();
-    }, 100);
-  };
+      initializeScanner()
+    }, 100)
+  }
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 z-50 bg-black">
@@ -109,13 +108,8 @@ export function QRScanner({ onScanSuccess, onClose, isOpen }: QRScannerProps) {
       <div className="relative h-full w-full">
         {isScanning ? (
           <>
-            <video
-              ref={videoRef}
-              className="h-full w-full object-cover"
-              playsInline
-              muted
-            />
-            
+            <video ref={videoRef} className="h-full w-full object-cover" playsInline muted />
+
             {/* Scan Overlay */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="relative">
@@ -125,14 +119,12 @@ export function QRScanner({ onScanSuccess, onClose, isOpen }: QRScannerProps) {
                   <div className="absolute top-0 right-0 h-8 w-8 border-t-4 border-r-4 border-blue-500 rounded-tr-lg" />
                   <div className="absolute bottom-0 left-0 h-8 w-8 border-b-4 border-l-4 border-blue-500 rounded-bl-lg" />
                   <div className="absolute bottom-0 right-0 h-8 w-8 border-b-4 border-r-4 border-blue-500 rounded-br-lg" />
-                  
+
                   {/* Scanning Line */}
                   <div className="absolute inset-x-0 top-1/2 h-0.5 bg-blue-500 animate-pulse" />
                 </div>
-                
-                <p className="text-white text-center mt-4">
-                  Position QR code within the frame
-                </p>
+
+                <p className="text-white text-center mt-4">Position QR code within the frame</p>
               </div>
             </div>
           </>
@@ -151,7 +143,7 @@ export function QRScanner({ onScanSuccess, onClose, isOpen }: QRScannerProps) {
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>
                 )}
-                
+
                 {!hasPermission ? (
                   <div className="text-center space-y-4">
                     <p className="text-muted-foreground">
@@ -163,9 +155,7 @@ export function QRScanner({ onScanSuccess, onClose, isOpen }: QRScannerProps) {
                   </div>
                 ) : (
                   <div className="text-center space-y-4">
-                    <p className="text-muted-foreground">
-                      Initializing camera...
-                    </p>
+                    <p className="text-muted-foreground">Initializing camera...</p>
                     <Button onClick={handleRetry} variant="outline" className="w-full">
                       <RotateCcw className="h-4 w-4 mr-2" />
                       Retry
@@ -189,7 +179,7 @@ export function QRScanner({ onScanSuccess, onClose, isOpen }: QRScannerProps) {
             >
               <Flashlight className="h-5 w-5" />
             </Button>
-            
+
             <Button
               variant="outline"
               onClick={handleRetry}
@@ -202,5 +192,5 @@ export function QRScanner({ onScanSuccess, onClose, isOpen }: QRScannerProps) {
         </div>
       )}
     </div>
-  );
+  )
 }

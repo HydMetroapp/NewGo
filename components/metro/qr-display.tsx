@@ -1,74 +1,73 @@
+'use client'
 
-'use client';
-
-import { useState, useEffect } from 'react';
-import { QrCode, RefreshCw, Clock, MapPin, CheckCircle, XCircle } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useEffect } from 'react'
+import { QrCode, RefreshCw, Clock, MapPin, CheckCircle, XCircle } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { useToast } from '@/hooks/use-toast'
 
 interface QRDisplayProps {
-  stationId: string;
-  stationName: string;
-  userId: string;
-  type: 'entry' | 'exit';
-  journeyId?: string;
-  onQRGenerated?: (qrCode: string) => void;
-  onError?: (error: string) => void;
+  stationId: string
+  stationName: string
+  userId: string
+  type: 'entry' | 'exit'
+  journeyId?: string
+  onQRGenerated?: (qrCode: string) => void
+  onError?: (error: string) => void
 }
 
 interface QRData {
-  qrCode: string;
-  validUntil: number;
-  generatedAt: number;
+  qrCode: string
+  validUntil: number
+  generatedAt: number
   station: {
-    id: string;
-    name: string;
-    code: string;
-  };
+    id: string
+    name: string
+    code: string
+  }
 }
 
-export function QRDisplay({ 
-  stationId, 
-  stationName, 
-  userId, 
-  type, 
+export function QRDisplay({
+  stationId,
+  stationName,
+  userId,
+  type,
   journeyId,
   onQRGenerated,
-  onError 
+  onError,
 }: QRDisplayProps) {
-  const [qrData, setQrData] = useState<QRData | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(0);
-  const [isExpired, setIsExpired] = useState(false);
-  const { toast } = useToast();
+  const [qrData, setQrData] = useState<QRData | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [timeRemaining, setTimeRemaining] = useState(0)
+  const [isExpired, setIsExpired] = useState(false)
+  const { toast } = useToast()
 
   useEffect(() => {
-    generateQRCode();
-  }, [stationId, userId, type, journeyId]);
+    generateQRCode()
+  }, [stationId, userId, type, journeyId])
 
   useEffect(() => {
-    if (!qrData) return;
+    if (!qrData) return
 
     const interval = setInterval(() => {
-      const now = Date.now();
-      const remaining = Math.max(0, qrData.validUntil - now);
-      setTimeRemaining(remaining);
-      
-      if (remaining === 0) {
-        setIsExpired(true);
-        clearInterval(interval);
-      }
-    }, 1000);
+      const now = Date.now()
+      const remaining = Math.max(0, qrData.validUntil - now)
+      setTimeRemaining(remaining)
 
-    return () => clearInterval(interval);
-  }, [qrData]);
+      if (remaining === 0) {
+        setIsExpired(true)
+        clearInterval(interval)
+      }
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [qrData])
 
   const generateQRCode = async () => {
-    setIsLoading(true);
-    setIsExpired(false);
+    setIsLoading(true)
+    setIsExpired(false)
 
     try {
       const response = await fetch('/api/qr/generate', {
@@ -82,54 +81,53 @@ export function QRDisplay({
           type,
           journeyId,
         }),
-      });
+      })
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to generate QR code');
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to generate QR code')
       }
 
-      const data = await response.json();
-      setQrData(data);
-      setTimeRemaining(data.validUntil - Date.now());
-      
-      onQRGenerated?.(data.qrCode);
+      const data = await response.json()
+      setQrData(data)
+      setTimeRemaining(data.validUntil - Date.now())
+
+      onQRGenerated?.(data.qrCode)
 
       toast({
-        title: "QR Code Generated",
+        title: 'QR Code Generated',
         description: `${type === 'entry' ? 'Entry' : 'Exit'} QR code ready for scanning`,
-      });
-
+      })
     } catch (error: any) {
-      console.error('QR generation error:', error);
-      const errorMessage = error.message || 'Failed to generate QR code';
-      onError?.(errorMessage);
-      
+      console.error('QR generation error:', error)
+      const errorMessage = error.message || 'Failed to generate QR code'
+      onError?.(errorMessage)
+
       toast({
-        title: "QR Generation Failed",
+        title: 'QR Generation Failed',
         description: errorMessage,
-        variant: "destructive",
-      });
+        variant: 'destructive',
+      })
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const refreshQRCode = () => {
-    generateQRCode();
-  };
+    generateQRCode()
+  }
 
   const formatTimeRemaining = (ms: number): string => {
-    const minutes = Math.floor(ms / 60000);
-    const seconds = Math.floor((ms % 60000) / 1000);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  };
+    const minutes = Math.floor(ms / 60000)
+    const seconds = Math.floor((ms % 60000) / 1000)
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`
+  }
 
   const getProgressPercentage = (): number => {
-    if (!qrData) return 0;
-    const totalDuration = 5 * 60 * 1000; // 5 minutes
-    return Math.max(0, (timeRemaining / totalDuration) * 100);
-  };
+    if (!qrData) return 0
+    const totalDuration = 5 * 60 * 1000 // 5 minutes
+    return Math.max(0, (timeRemaining / totalDuration) * 100)
+  }
 
   if (isLoading) {
     return (
@@ -146,7 +144,7 @@ export function QRDisplay({
           </div>
         </CardContent>
       </Card>
-    );
+    )
   }
 
   if (!qrData) {
@@ -168,7 +166,7 @@ export function QRDisplay({
           </Button>
         </CardContent>
       </Card>
-    );
+    )
   }
 
   return (
@@ -183,7 +181,7 @@ export function QRDisplay({
           {qrData.station.name}
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
         {/* QR Code Display */}
         <div className="relative">
@@ -192,7 +190,7 @@ export function QRDisplay({
               {qrData.qrCode}
             </div>
           </div>
-          
+
           {isExpired && (
             <div className="absolute inset-0 bg-red-500/20 rounded-lg flex items-center justify-center">
               <Badge variant="destructive" className="text-lg px-4 py-2">
@@ -205,19 +203,19 @@ export function QRDisplay({
         {/* Status and Timer */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">
-              {isExpired ? 'Expired' : 'Valid for'}
-            </span>
+            <span className="text-sm font-medium">{isExpired ? 'Expired' : 'Valid for'}</span>
             <div className="flex items-center gap-1">
               <Clock className="h-4 w-4" />
-              <span className={`font-mono ${isExpired ? 'text-red-600' : timeRemaining < 60000 ? 'text-orange-600' : 'text-green-600'}`}>
+              <span
+                className={`font-mono ${isExpired ? 'text-red-600' : timeRemaining < 60000 ? 'text-orange-600' : 'text-green-600'}`}
+              >
                 {isExpired ? '0:00' : formatTimeRemaining(timeRemaining)}
               </span>
             </div>
           </div>
-          
-          <Progress 
-            value={getProgressPercentage()} 
+
+          <Progress
+            value={getProgressPercentage()}
             className={`h-2 ${isExpired ? 'bg-red-100' : timeRemaining < 60000 ? 'bg-orange-100' : 'bg-green-100'}`}
           />
         </div>
@@ -225,12 +223,11 @@ export function QRDisplay({
         {/* Instructions */}
         <div className="text-center space-y-2">
           <p className="text-sm text-muted-foreground">
-            {type === 'entry' 
+            {type === 'entry'
               ? 'Scan this QR code at the station entry gate'
-              : 'Scan this QR code at the station exit gate'
-            }
+              : 'Scan this QR code at the station exit gate'}
           </p>
-          
+
           {isExpired ? (
             <Button onClick={refreshQRCode} className="w-full">
               <RefreshCw className="h-4 w-4 mr-2" />
@@ -251,5 +248,5 @@ export function QRDisplay({
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

@@ -1,30 +1,29 @@
+'use client'
 
-'use client';
-
-import { useState } from 'react';
-import { 
-  Home, 
-  CreditCard, 
-  History, 
-  QrCode, 
-  MapPin, 
-  Bell, 
-  User, 
+import { useState } from 'react'
+import {
+  Home,
+  CreditCard,
+  History,
+  QrCode,
+  MapPin,
+  Bell,
+  User,
   Settings,
   LogOut,
-  X
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/hooks/use-auth';
-import { useNotifications } from '@/hooks/use-notifications';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
+  X,
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { useAuth } from '@/hooks/use-auth'
+import { useNotifications } from '@/hooks/use-notifications'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { cn } from '@/lib/utils'
 
 interface SidebarProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean
+  onClose: () => void
 }
 
 const navigation = [
@@ -34,46 +33,41 @@ const navigation = [
   { name: 'Journey History', href: '/history', icon: History },
   { name: 'Stations', href: '/stations', icon: MapPin },
   { name: 'Notifications', href: '/notifications', icon: Bell },
-];
+]
 
 const bottomNavigation = [
   { name: 'Profile', href: '/profile', icon: User },
   { name: 'Settings', href: '/settings', icon: Settings },
-];
+]
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
-  const { user, isAuthenticated, signOut } = useAuth();
-  const { unreadCount } = useNotifications();
-  const pathname = usePathname();
+  const { user, isAuthenticated, signOut } = useAuth()
+  const { unreadCount } = useNotifications()
+  const pathname = usePathname()
 
   const handleSignOut = async () => {
     try {
-      await signOut();
-      onClose();
+      await signOut()
+      onClose()
     } catch (error) {
-      console.error('Sign out error:', error);
+      console.error('Sign out error:', error)
     }
-  };
+  }
 
   if (!isAuthenticated) {
-    return null;
+    return null
   }
 
   return (
     <>
       {/* Overlay */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 z-40 bg-black/50 md:hidden" 
-          onClick={onClose}
-        />
-      )}
+      {isOpen && <div className="fixed inset-0 z-40 bg-black/50 md:hidden" onClick={onClose} />}
 
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed left-0 top-0 z-50 h-full w-64 transform bg-background border-r transition-transform duration-200 ease-in-out md:translate-x-0",
-          isOpen ? "translate-x-0" : "-translate-x-full"
+          'fixed left-0 top-0 z-50 h-full w-64 transform bg-background border-r transition-transform duration-200 ease-in-out md:translate-x-0',
+          isOpen ? 'translate-x-0' : '-translate-x-full',
         )}
       >
         <div className="flex h-full flex-col">
@@ -85,12 +79,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               </div>
               <span className="font-semibold">Hyderabad Metro</span>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              className="md:hidden"
-            >
+            <Button variant="ghost" size="icon" onClick={onClose} className="md:hidden">
               <X className="h-5 w-5" />
             </Button>
           </div>
@@ -99,11 +88,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           <div className="p-4 border-b">
             <div className="flex items-center gap-3">
               {user?.profileImage ? (
-                <img 
-                  src={user.profileImage} 
-                  alt={user.name}
-                  className="h-10 w-10 rounded-full"
-                />
+                <img src={user.profileImage} alt={user.name} className="h-10 w-10 rounded-full" />
               ) : (
                 <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
                   <User className="h-5 w-5 text-blue-600" />
@@ -119,17 +104,15 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-2">
             {navigation.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = pathname === item.href
               return (
                 <Link
                   key={item.name}
                   href={item.href}
                   onClick={onClose}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                    isActive
-                      ? "bg-blue-100 text-blue-700"
-                      : "text-gray-700 hover:bg-gray-100"
+                    'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                    isActive ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100',
                   )}
                 >
                   <item.icon className="h-5 w-5" />
@@ -140,32 +123,30 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     </Badge>
                   )}
                 </Link>
-              );
+              )
             })}
           </nav>
 
           {/* Bottom Navigation */}
           <div className="p-4 border-t space-y-2">
             {bottomNavigation.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = pathname === item.href
               return (
                 <Link
                   key={item.name}
                   href={item.href}
                   onClick={onClose}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                    isActive
-                      ? "bg-blue-100 text-blue-700"
-                      : "text-gray-700 hover:bg-gray-100"
+                    'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                    isActive ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100',
                   )}
                 >
                   <item.icon className="h-5 w-5" />
                   <span>{item.name}</span>
                 </Link>
-              );
+              )
             })}
-            
+
             <Button
               variant="ghost"
               onClick={handleSignOut}
@@ -178,5 +159,5 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
       </aside>
     </>
-  );
+  )
 }

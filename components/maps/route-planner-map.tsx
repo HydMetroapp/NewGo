@@ -1,19 +1,24 @@
+'use client'
 
-'use client';
-
-import React, { useState, useEffect } from 'react';
-import { SimpleMap } from './simple-map';
-import { METRO_STATIONS_DATA, METRO_LINES } from '@/lib/constants';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { ArrowRight, MapPin, Clock, Route, Shuffle } from 'lucide-react';
+import React, { useState, useEffect } from 'react'
+import { SimpleMap } from './simple-map'
+import { METRO_STATIONS_DATA, METRO_LINES } from '@/lib/constants'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
+import { ArrowRight, MapPin, Clock, Route, Shuffle } from 'lucide-react'
 
 interface RoutePlannerMapProps {
-  fromStationId?: string;
-  toStationId?: string;
-  onRouteChange?: (fromStationId: string, toStationId: string) => void;
+  fromStationId?: string
+  toStationId?: string
+  onRouteChange?: (fromStationId: string, toStationId: string) => void
 }
 
 export const RoutePlannerMap: React.FC<RoutePlannerMapProps> = ({
@@ -21,27 +26,27 @@ export const RoutePlannerMap: React.FC<RoutePlannerMapProps> = ({
   toStationId: initialToStationId,
   onRouteChange,
 }) => {
-  const [fromStationId, setFromStationId] = useState(initialFromStationId || '');
-  const [toStationId, setToStationId] = useState(initialToStationId || '');
-  const [routeInfo, setRouteInfo] = useState<any>(null);
-  const [isPlanning, setIsPlanning] = useState(false);
+  const [fromStationId, setFromStationId] = useState(initialFromStationId || '')
+  const [toStationId, setToStationId] = useState(initialToStationId || '')
+  const [routeInfo, setRouteInfo] = useState<any>(null)
+  const [isPlanning, setIsPlanning] = useState(false)
 
   useEffect(() => {
     if (fromStationId && toStationId && fromStationId !== toStationId) {
-      planRoute();
+      planRoute()
     } else {
-      setRouteInfo(null);
+      setRouteInfo(null)
     }
-  }, [fromStationId, toStationId]);
+  }, [fromStationId, toStationId])
 
   const planRoute = async () => {
-    if (!fromStationId || !toStationId || fromStationId === toStationId) return;
+    if (!fromStationId || !toStationId || fromStationId === toStationId) return
 
-    setIsPlanning(true);
+    setIsPlanning(true)
     try {
-      const fromStation = METRO_STATIONS_DATA.find(s => s.id === fromStationId);
-      const toStation = METRO_STATIONS_DATA.find(s => s.id === toStationId);
-      
+      const fromStation = METRO_STATIONS_DATA.find((s) => s.id === fromStationId)
+      const toStation = METRO_STATIONS_DATA.find((s) => s.id === toStationId)
+
       if (fromStation && toStation) {
         // Simple route calculation
         const route = {
@@ -49,50 +54,53 @@ export const RoutePlannerMap: React.FC<RoutePlannerMapProps> = ({
           totalDistance: 5000, // Mock distance
           estimatedTime: 15, // Mock time
           interchanges: fromStation.line !== toStation.line ? ['Ameerpet'] : [],
-        };
-        setRouteInfo(route);
-        onRouteChange?.(fromStationId, toStationId);
+        }
+        setRouteInfo(route)
+        onRouteChange?.(fromStationId, toStationId)
       }
     } catch (error) {
-      console.error('Failed to plan route:', error);
+      console.error('Failed to plan route:', error)
     } finally {
-      setIsPlanning(false);
+      setIsPlanning(false)
     }
-  };
+  }
 
   const swapStations = () => {
-    const temp = fromStationId;
-    setFromStationId(toStationId);
-    setToStationId(temp);
-  };
+    const temp = fromStationId
+    setFromStationId(toStationId)
+    setToStationId(temp)
+  }
 
   const formatDistance = (distance: number): string => {
     if (distance < 1000) {
-      return `${Math.round(distance)}m`;
+      return `${Math.round(distance)}m`
     }
-    return `${(distance / 1000).toFixed(1)}km`;
-  };
+    return `${(distance / 1000).toFixed(1)}km`
+  }
 
   const estimateJourneyTime = (distance: number): string => {
     // Rough estimate: 30 km/h average speed including stops
-    const avgSpeed = 30; // km/h
-    const timeInHours = (distance / 1000) / avgSpeed;
-    const timeInMinutes = Math.round(timeInHours * 60);
-    return `${Math.max(timeInMinutes, 5)} min`; // Minimum 5 minutes
-  };
+    const avgSpeed = 30 // km/h
+    const timeInHours = distance / 1000 / avgSpeed
+    const timeInMinutes = Math.round(timeInHours * 60)
+    return `${Math.max(timeInMinutes, 5)} min` // Minimum 5 minutes
+  }
 
-  const groupedStations = METRO_STATIONS_DATA.reduce((acc, station) => {
-    const lineInfo = METRO_LINES[station.line as keyof typeof METRO_LINES];
-    if (!acc[station.line]) {
-      acc[station.line] = {
-        name: lineInfo?.name || station.line,
-        color: lineInfo?.color || '#2563EB',
-        stations: [],
-      };
-    }
-    acc[station.line].stations.push(station);
-    return acc;
-  }, {} as Record<string, { name: string; color: string; stations: typeof METRO_STATIONS_DATA }>);
+  const groupedStations = METRO_STATIONS_DATA.reduce(
+    (acc, station) => {
+      const lineInfo = METRO_LINES[station.line as keyof typeof METRO_LINES]
+      if (!acc[station.line]) {
+        acc[station.line] = {
+          name: lineInfo?.name || station.line,
+          color: lineInfo?.color || '#2563EB',
+          stations: [],
+        }
+      }
+      acc[station.line].stations.push(station)
+      return acc
+    },
+    {} as Record<string, { name: string; color: string; stations: typeof METRO_STATIONS_DATA }>,
+  )
 
   return (
     <div className="space-y-4">
@@ -152,8 +160,8 @@ export const RoutePlannerMap: React.FC<RoutePlannerMapProps> = ({
                         {lineData.name}
                       </div>
                       {lineData.stations.map((station) => (
-                        <SelectItem 
-                          key={station.id} 
+                        <SelectItem
+                          key={station.id}
                           value={station.id}
                           disabled={station.id === fromStationId}
                         >
@@ -218,24 +226,26 @@ export const RoutePlannerMap: React.FC<RoutePlannerMapProps> = ({
                 <h4 className="font-medium text-gray-900">Journey Steps</h4>
                 <div className="space-y-2">
                   {routeInfo.stations.map((station, index) => {
-                    const lineInfo = METRO_LINES[station.line as keyof typeof METRO_LINES];
-                    const isInterchange = routeInfo.interchanges.includes(station.name);
-                    
+                    const lineInfo = METRO_LINES[station.line as keyof typeof METRO_LINES]
+                    const isInterchange = routeInfo.interchanges.includes(station.name)
+
                     return (
                       <div key={`${station.id}-${index}`} className="flex items-center space-x-3">
                         <div className="flex flex-col items-center">
                           <div
                             className={`w-3 h-3 rounded-full ${
-                              index === 0 ? 'bg-green-500' : 
-                              index === routeInfo.stations.length - 1 ? 'bg-red-500' : 
-                              'bg-gray-400'
+                              index === 0
+                                ? 'bg-green-500'
+                                : index === routeInfo.stations.length - 1
+                                  ? 'bg-red-500'
+                                  : 'bg-gray-400'
                             }`}
                           />
                           {index < routeInfo.stations.length - 1 && (
                             <div className="w-0.5 h-6 bg-gray-300 mt-1" />
                           )}
                         </div>
-                        
+
                         <div className="flex-1">
                           <div className="flex items-center space-x-2">
                             <span className="font-medium">{station.name}</span>
@@ -253,13 +263,17 @@ export const RoutePlannerMap: React.FC<RoutePlannerMapProps> = ({
                         </div>
 
                         {index === 0 && (
-                          <Badge variant="outline" className="text-xs">Start</Badge>
+                          <Badge variant="outline" className="text-xs">
+                            Start
+                          </Badge>
                         )}
                         {index === routeInfo.stations.length - 1 && (
-                          <Badge variant="outline" className="text-xs">End</Badge>
+                          <Badge variant="outline" className="text-xs">
+                            End
+                          </Badge>
                         )}
                       </div>
-                    );
+                    )
                   })}
                 </div>
               </div>
@@ -293,5 +307,5 @@ export const RoutePlannerMap: React.FC<RoutePlannerMapProps> = ({
         </div>
       )}
     </div>
-  );
-};
+  )
+}

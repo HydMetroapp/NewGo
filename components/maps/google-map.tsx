@@ -1,18 +1,17 @@
+'use client'
 
-'use client';
-
-import React, { useEffect, useRef, useState } from 'react';
-import { MapsService } from '@/lib/services/maps-service';
-import { Location } from '@/lib/types';
-import { Loader2 } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react'
+import { MapsService } from '@/lib/services/maps-service'
+import { Location } from '@/lib/types'
+import { Loader2 } from 'lucide-react'
 
 interface GoogleMapProps {
-  className?: string;
-  onMapReady?: (map: google.maps.Map) => void;
-  userLocation?: Location;
-  selectedStationId?: string;
-  showDirections?: boolean;
-  height?: string;
+  className?: string
+  onMapReady?: (map: google.maps.Map) => void
+  userLocation?: Location
+  selectedStationId?: string
+  showDirections?: boolean
+  height?: string
 }
 
 export const GoogleMap: React.FC<GoogleMapProps> = ({
@@ -23,53 +22,54 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
   showDirections = false,
   height = '400px',
 }) => {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const mapRef = useRef<HTMLDivElement>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [map, setMap] = useState<google.maps.Map | null>(null)
 
   useEffect(() => {
     const initializeMap = async () => {
-      if (!mapRef.current) return;
+      if (!mapRef.current) return
 
       try {
-        setIsLoading(true);
-        setError(null);
+        setIsLoading(true)
+        setError(null)
 
-        const mapInstance = await MapsService.initializeMap(mapRef.current);
-        setMap(mapInstance);
-        onMapReady?.(mapInstance);
+        const mapInstance = await MapsService.initializeMap(mapRef.current)
+        setMap(mapInstance)
+        onMapReady?.(mapInstance)
       } catch (err) {
-        console.error('Failed to initialize map:', err);
-        setError('Failed to load map. Please check your internet connection.');
+        console.error('Failed to initialize map:', err)
+        setError('Failed to load map. Please check your internet connection.')
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
-    initializeMap();
-  }, [onMapReady]);
+    initializeMap()
+  }, [onMapReady])
 
   useEffect(() => {
     if (map && userLocation) {
-      MapsService.updateUserLocation(userLocation);
+      MapsService.updateUserLocation(userLocation)
     }
-  }, [map, userLocation]);
+  }, [map, userLocation])
 
   useEffect(() => {
     if (map && selectedStationId) {
-      MapsService.centerOnStation(selectedStationId);
-      
+      MapsService.centerOnStation(selectedStationId)
+
       if (showDirections && userLocation) {
-        MapsService.showDirectionsToStation(selectedStationId, userLocation)
-          .catch(err => console.error('Failed to show directions:', err));
+        MapsService.showDirectionsToStation(selectedStationId, userLocation).catch((err) =>
+          console.error('Failed to show directions:', err),
+        )
       }
     }
-  }, [map, selectedStationId, showDirections, userLocation]);
+  }, [map, selectedStationId, showDirections, userLocation])
 
   if (error) {
     return (
-      <div 
+      <div
         className={`flex items-center justify-center bg-gray-100 rounded-lg ${className}`}
         style={{ height }}
       >
@@ -78,7 +78,7 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
           <p className="text-sm text-gray-600">{error}</p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -91,11 +91,7 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
           </div>
         </div>
       )}
-      <div
-        ref={mapRef}
-        className="w-full h-full rounded-lg"
-        style={{ minHeight: height }}
-      />
+      <div ref={mapRef} className="w-full h-full rounded-lg" style={{ minHeight: height }} />
     </div>
-  );
-};
+  )
+}

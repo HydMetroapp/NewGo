@@ -19,6 +19,9 @@ yarn-error.log*
 .env.production.local
 !.env.example
 
+# Yarn
+.yarn/
+
 # Prisma
 .prisma/
 node_modules/.prisma/

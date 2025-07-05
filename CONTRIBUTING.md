@@ -1,4 +1,3 @@
-
 # Contributing to Hyderabad Metro PWA
 
 Thank you for your interest in contributing to the Hyderabad Metro PWA! We welcome contributions from the community and are grateful for your support.
@@ -66,6 +65,7 @@ Feature requests are welcome! Please provide:
 ### Pull Request Process
 
 1. **Create a feature branch**:
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -73,6 +73,7 @@ Feature requests are welcome! Please provide:
 2. **Make your changes** following our coding standards
 
 3. **Test your changes**:
+
    ```bash
    npm run test
    npm run lint
@@ -80,11 +81,13 @@ Feature requests are welcome! Please provide:
    ```
 
 4. **Commit your changes**:
+
    ```bash
    git commit -m "feat: add your feature description"
    ```
 
 5. **Push to your fork**:
+
    ```bash
    git push origin feature/your-feature-name
    ```
@@ -125,6 +128,7 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org/) speci
 ```
 
 **Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation changes
@@ -134,6 +138,7 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org/) speci
 - `chore`: Maintenance tasks
 
 **Examples:**
+
 ```
 feat(metro-map): add station search functionality
 fix(route-planner): resolve incorrect fare calculation
@@ -208,6 +213,7 @@ We use labels to categorize issues:
 ## 🎉 Recognition
 
 Contributors will be recognized in:
+
 - README.md contributors section
 - Release notes for significant contributions
 - Special mentions in project updates
